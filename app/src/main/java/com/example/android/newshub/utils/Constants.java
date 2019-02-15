@@ -21,7 +21,7 @@ public class Constants {
 
     public static final String TOP_STORIES = "Top Stories";
 
-    public static final String TOP_STORIES_HOME = "home";
+    public static final String TOP_STORIES_HOME = "home.json";
 
     public static final String SEARCH_RESULTS = "Search Results";
 

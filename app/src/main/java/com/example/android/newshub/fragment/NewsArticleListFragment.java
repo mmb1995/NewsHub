@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,10 +106,12 @@ public class NewsArticleListFragment extends Fragment implements ArticleClickLis
         NewsArticleViewModel model = ViewModelProviders.of(this, mFactoryViewModel)
                 .get(NewsArticleViewModel.class);
 
+        Log.i(TAG, "query = " + mQuery);
         // Check for the api to query
         if (this.mType.equals(Constants.TOP_STORIES)) {
             model.getTopStories(mQuery).observe(this, topStories -> {
                 if (topStories != null) {
+                    Log.i(TAG, "Received top stories");
                     mAdapter = new NewsArticleAdapter(getContext(), this, topStories);
                     mRecyclerView.setAdapter(mAdapter);
                 }

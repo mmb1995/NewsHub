@@ -41,6 +41,7 @@ public class NewsRepository {
     public LiveData<List<NewsArticle>> getTopStories(String searchTerm) {
         final MutableLiveData<List<NewsArticle>> results = new MutableLiveData<>();
 
+        Log.i(TAG, "Api key = " + BuildConfig.NYT_API_KEY);
         // Performs the network request to the Nyt api
         mNewsApiService.getTopStories(searchTerm, BuildConfig.NYT_API_KEY, Constants.SORT_VALUE)
                 .enqueue(new Callback<TopStoriesResponse>() {
