@@ -12,9 +12,11 @@ import android.widget.TextView;
 import com.example.android.newshub.R;
 import com.example.android.newshub.interfaces.ArticleClickListener;
 import com.example.android.newshub.model.NewsArticle;
+import com.example.android.newshub.utils.Constants;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,10 +50,39 @@ public class NewsArticleAdapter extends  RecyclerView.Adapter<NewsArticleAdapter
         holder.mAbstractTextView.setText(currentArticle.snippet);
         holder.mSectionTextView.setText("Politics");
 
+        String imageUrl;
+
+        // Checks to see if there are valid image urls available
+        if (currentArticle.images != null) {
+            Map<String, String> multimedia = currentArticle.images;
+            if (multimedia.containsKey(Constants.JUMBO_IMAGE_KEY)) {
+                imageUrl = multimedia.get(Constants.JUMBO_IMAGE_KEY);
+            } else if (multimedia.containsKey(Constants.MEDIUM_IMAGE_KEY)) {
+                imageUrl = multimedia.get(Constants.MEDIUM_IMAGE_KEY);
+            } else {
+                imageUrl = null;
+            }
+        } else {
+            imageUrl = null;
+        }
+
         // load image
-        Picasso.get()
-                .load(currentArticle.imageUrl)
-                .into(holder.mArticleImageView);
+        if (imageUrl != null) {
+            //Log.i(TAG, "imageUrl = " + imageUrl);
+            Picasso.get()
+                    .load(imageUrl)
+                    .fit()
+                    .centerCrop()
+                    .error(R.drawable.nyt_error_image)
+                    .into(holder.mArticleImageView);
+        } else {
+            // No valid images available
+            Picasso.get()
+                    .load(R.drawable.nyt_error_image)
+                    .fit()
+                    .centerCrop()
+                    .into(holder.mArticleImageView);
+        }
 
     }
 

@@ -14,11 +14,12 @@ import com.example.android.newshub.model.retrofit.TopStoriesResponse;
 import com.example.android.newshub.remote.NytApiService;
 import com.example.android.newshub.utils.Constants;
 
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -111,9 +112,9 @@ public class NewsRepository {
 
             //image extracting
             List<Multimedia> multimediaList = article.getMultimedia();
-            String imageUrl = extractImageUrl(multimediaList, Constants.MAX_IMAGE_WIDTH);
+            Map<String, String> images = mapImageUrls(multimediaList);
 
-            NewsArticle story = new NewsArticle(headline, webUrl, publishTime, snippet, imageUrl);
+            NewsArticle story = new NewsArticle(headline, webUrl, publishTime, snippet, images);
             articles.add(story);
         }
         return articles;
@@ -140,35 +141,25 @@ public class NewsRepository {
 
             //image extracting
             List<Multimedia> multimedia = article.getMultimedia();
-            String imageUrl = "https://static01.nyt.com/" + extractImageUrl(multimedia, Constants.MAX_IMAGE_WIDTH); //add domain
+            Map<String, String> images = mapImageUrls(multimedia);
 
-            NewsArticle story = new NewsArticle(headline, webUrl, publishTime, snippet, imageUrl);
+            NewsArticle story = new NewsArticle(headline, webUrl, publishTime, snippet, images);
             articles.add(story);
         }
         return articles;
     }
 
     /**
-     * Returns the url of the image in the NYT multimedia JSON Array.
-     * Chooses the largest image smaller than `maxWidth`.
+     * Returns a map where the images format is the key and the url is the value
+     *
      */
-    private String extractImageUrl(List<Multimedia> multimediaList, int maxWidth) {
-        String biggestImageUrl = "";
-        int biggestImageSize = 0;
-
-        try {
-            //simple maximum search
-            for(Multimedia multimediaItem: multimediaList) {
-                int imageWidth = multimediaItem.getWidth();
-                if (imageWidth <= maxWidth && imageWidth > biggestImageSize) {
-                    biggestImageUrl = multimediaItem.getUrl();
-                    biggestImageSize = multimediaItem.getWidth();
-                }
+    private Map<String, String> mapImageUrls(List<Multimedia> multimediaList) {
+        Map<String, String> imagesMap = new HashMap();
+        for (Multimedia multimedia: multimediaList) {
+            if (multimedia.getFormat() != null && !imagesMap.containsKey(multimedia.getFormat())) {
+                imagesMap.put(multimedia.getFormat(), multimedia.getUrl());
             }
-        } catch (Exception e){
-            Log.e(TAG, "Error parsing multimedia", e); //Android log the error
         }
-
-        return biggestImageUrl;
+        return imagesMap;
     }
 }

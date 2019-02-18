@@ -25,5 +25,11 @@ public class Constants {
 
     public static final String SEARCH_RESULTS = "Search Results";
 
+    public static final String MEDIUM_IMAGE_KEY = "mediumThreeByTwo210";
+
+    public static final String JUMBO_IMAGE_KEY = "superJumbo";
+
+    public static final String THUMBNAIL_IMAGE_KEY = "thumbLarge";
+
     public static final int MAX_IMAGE_WIDTH = 3000;
 }
