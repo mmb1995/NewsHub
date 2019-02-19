@@ -48,7 +48,7 @@ public class NewsArticleAdapter extends  RecyclerView.Adapter<NewsArticleAdapter
         NewsArticle currentArticle = mNewsArticles.get(position);
         holder.mTitleTextView.setText(currentArticle.headline);
         holder.mAbstractTextView.setText(currentArticle.snippet);
-        holder.mSectionTextView.setText("Politics");
+        holder.mSectionTextView.setText(currentArticle.section);
 
         String imageUrl;
 

@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.android.newshub.R;
 import com.example.android.newshub.adapter.NewsArticleAdapter;
@@ -41,6 +43,8 @@ public class NewsArticleListFragment extends Fragment implements ArticleClickLis
 
     @BindView(R.id.articleRecyclerView)
     RecyclerView mRecyclerView;
+    @BindView(R.id.newsArticleProgressBar)
+    ProgressBar mProgressBar;
 
     @Inject
     public FactoryViewModel mFactoryViewModel;
@@ -110,10 +114,15 @@ public class NewsArticleListFragment extends Fragment implements ArticleClickLis
         // Check for the api to query
         if (this.mType.equals(Constants.TOP_STORIES)) {
             model.getTopStories(mQuery).observe(this, topStories -> {
+                mProgressBar.setVisibility(View.GONE);
                 if (topStories != null) {
                     Log.i(TAG, "Received top stories");
                     mAdapter = new NewsArticleAdapter(getContext(), this, topStories);
                     mRecyclerView.setAdapter(mAdapter);
+                } else {
+                    Log.i(TAG, "Failed to receive articles");
+                    Toast.makeText(getActivity(), getResources().getString(R.string.error_message),
+                            Toast.LENGTH_LONG).show();
                 }
             });
         } else {

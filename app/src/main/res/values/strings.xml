@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">NewsHub</string>
+    <string name="error_message">Failed to load data. Please check your internet connection</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- PreviewFragment -->
+    <string name="full_article_btn">Full Article</string>
+
+    <!-- WebViewModalFragment -->
+    <string name="webview_close_message">Close</string>
+    <string name="webview_search">Search</string>
 </resources>

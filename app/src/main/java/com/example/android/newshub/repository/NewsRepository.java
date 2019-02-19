@@ -57,7 +57,9 @@ public class NewsRepository {
 
                     @Override
                     public void onFailure(Call<TopStoriesResponse> call, Throwable t) {
-
+                        Log.i(TAG, "Failed to get data");
+                        // TODO replace
+                        results.setValue(null);
                     }
                 });
         return results;
@@ -84,6 +86,8 @@ public class NewsRepository {
             @Override
             public void onFailure(Call<ArticleSearchResponse> call, Throwable t) {
                 t.printStackTrace();
+                // TODO replace
+                //results.setValue(null);
             }
         });
         return results;
@@ -99,6 +103,8 @@ public class NewsRepository {
             String headline = article.getTitle();
             String webUrl = article.getUrl();
             String snippet = article.getAbstract();
+            String byline = article.getByline();
+            String section = article.getSection();
 
             //date handling
             String pubDateString = article.getPublishedDate();
@@ -114,7 +120,7 @@ public class NewsRepository {
             List<Multimedia> multimediaList = article.getMultimedia();
             Map<String, String> images = mapImageUrls(multimediaList);
 
-            NewsArticle story = new NewsArticle(headline, webUrl, publishTime, snippet, images);
+            NewsArticle story = new NewsArticle(headline, webUrl, publishTime, snippet, byline, section, images);
             articles.add(story);
         }
         return articles;
@@ -143,7 +149,7 @@ public class NewsRepository {
             List<Multimedia> multimedia = article.getMultimedia();
             Map<String, String> images = mapImageUrls(multimedia);
 
-            NewsArticle story = new NewsArticle(headline, webUrl, publishTime, snippet, images);
+            NewsArticle story = new NewsArticle(headline, webUrl, publishTime, snippet, null, null, images);
             articles.add(story);
         }
         return articles;
