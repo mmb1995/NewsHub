@@ -16,7 +16,7 @@ import android.widget.Toast;
 import com.example.android.newshub.R;
 import com.example.android.newshub.adapter.NewsArticleAdapter;
 import com.example.android.newshub.interfaces.ArticleClickListener;
-import com.example.android.newshub.model.NewsArticle;
+import com.example.android.newshub.model.entity.NewsArticle;
 import com.example.android.newshub.utils.Constants;
 import com.example.android.newshub.viewmodel.FactoryViewModel;
 import com.example.android.newshub.viewmodel.NewsArticleViewModel;
@@ -49,7 +49,7 @@ public class NewsArticleListFragment extends Fragment implements ArticleClickLis
     @Inject
     public FactoryViewModel mFactoryViewModel;
 
-    // ViewModel shared by multiple fragments for keeping track of the currently selected NewsArticle
+    // ViewModel shared by multiple fragments for keeping track of the currently selected TopStoriesArticle
     private SelectedArticleViewModel mSharedViewModel;
     private String mType;
     private String mQuery;
@@ -113,26 +113,30 @@ public class NewsArticleListFragment extends Fragment implements ArticleClickLis
         Log.i(TAG, "query = " + mQuery);
         // Check for the api to query
         if (this.mType.equals(Constants.TOP_STORIES)) {
-            model.getTopStories(mQuery).observe(this, topStories -> {
-                mProgressBar.setVisibility(View.GONE);
-                if (topStories != null) {
-                    Log.i(TAG, "Received top stories");
-                    mAdapter = new NewsArticleAdapter(getContext(), this, topStories);
-                    mRecyclerView.setAdapter(mAdapter);
-                } else {
-                    Log.i(TAG, "Failed to receive articles");
-                    Toast.makeText(getActivity(), getResources().getString(R.string.error_message),
-                            Toast.LENGTH_LONG).show();
+            model.getTopStories(mQuery).observe(this, topStoriesResource -> {
+                switch (topStoriesResource.status) {
+                    case SUCCESS:
+                        mProgressBar.setVisibility(View.GONE);
+                        mAdapter = new NewsArticleAdapter(getContext(), this,
+                                topStoriesResource.data);
+                        mRecyclerView.setAdapter(mAdapter);
+                        Log.i(TAG,"number of articles = " + topStoriesResource.data.size());
+                        break;
+                    case LOADING:
+                        Log.i(TAG, "loading");
+                        mProgressBar.setVisibility(View.VISIBLE);
+                        break;
+                    case ERROR:
+                        mProgressBar.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), getResources().getString(R.string.error_message),
+                                Toast.LENGTH_LONG).show();
+                        break;
+                    default:
+                        Log.i(TAG, "hit default");
+                        break;
                 }
             });
-        } else {
-            // Article Search API
-            model.getArticleSearchResults(mQuery, null, null).observe(this,
-                    searchResults -> {
-
-                    });
         }
-
     }
 
     @Override

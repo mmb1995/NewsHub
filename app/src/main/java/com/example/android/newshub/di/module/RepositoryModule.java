@@ -1,5 +1,6 @@
 package com.example.android.newshub.di.module;
 
+import com.example.android.newshub.database.NewsDao;
 import com.example.android.newshub.remote.NytApiService;
 import com.example.android.newshub.repository.NewsRepository;
 
@@ -12,7 +13,7 @@ import dagger.Provides;
 public class RepositoryModule {
     @Provides
     @Singleton
-    NewsRepository providesNewsRepository(NytApiService service) {
-        return new NewsRepository(service);
+    NewsRepository providesNewsRepository(NytApiService service, NewsDao dao) {
+        return new NewsRepository(service, dao);
     }
 }

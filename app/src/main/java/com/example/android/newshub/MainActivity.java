@@ -9,7 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.example.android.newshub.fragment.NewsArticleListFragment;
 import com.example.android.newshub.fragment.PreviewFragment;
 import com.example.android.newshub.fragment.WebViewModalFragment;
-import com.example.android.newshub.model.NewsArticle;
+import com.example.android.newshub.model.entity.NewsArticle;
 import com.example.android.newshub.utils.Constants;
 import com.example.android.newshub.viewmodel.SelectedArticleViewModel;
 
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
      * @param article article to be displayed
      */
     private void displayFullArticle(NewsArticle article) {
-        WebViewModalFragment webFragment = WebViewModalFragment.newInstance(article.webUrl);
+        WebViewModalFragment webFragment = WebViewModalFragment.newInstance(article.url);
         webFragment.show(getSupportFragmentManager(), WEB_VIEW_TAG);
     }
 

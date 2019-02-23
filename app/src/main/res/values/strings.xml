@@ -2,6 +2,14 @@
     <string name="app_name">NewsHub</string>
     <string name="error_message">Failed to load data. Please check your internet connection</string>
 
+    <!-- MainActivity -->
+    <string name="action_dropdown">Sections</string>
+    <string-array name="sections_dropdown_array">
+        <item>Home</item>
+        <item>World</item>
+        <item>Sports</item>
+    </string-array>
+
     <!-- PreviewFragment -->
     <string name="full_article_btn">Full Article</string>
 

@@ -15,12 +15,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.newshub.R;
-import com.example.android.newshub.model.NewsArticle;
-import com.example.android.newshub.utils.Constants;
+import com.example.android.newshub.model.entity.NewsArticle;
 import com.example.android.newshub.viewmodel.SelectedArticleViewModel;
 import com.squareup.picasso.Picasso;
-
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -105,23 +102,11 @@ public class PreviewFragment extends Fragment {
         mAbstractTextView.setText(mNewsArticle.snippet);
         mFullArticleBtn.setVisibility(View.VISIBLE);
 
-        // Checks to see if there are valid image urls available
-        String imageUrl;
-        if (mNewsArticle.images != null) {
-            Map<String, String> multimedia = mNewsArticle.images;
-            if (multimedia.containsKey(Constants.JUMBO_IMAGE_KEY)) {
-                imageUrl = multimedia.get(Constants.JUMBO_IMAGE_KEY);
-            } else if (multimedia.containsKey(Constants.MEDIUM_IMAGE_KEY)) {
-                imageUrl = multimedia.get(Constants.MEDIUM_IMAGE_KEY);
-            } else {
-                imageUrl = null;
-            }
-        } else {
-            imageUrl = null;
-        }
+        // Attempt to get imageUrl
+        String imageUrl = mNewsArticle.imageUrl;
 
         // load image
-        if (imageUrl != null) {
+        if (imageUrl != null && !imageUrl.equals("")) {
             Log.i(TAG, "imageUrl = " + imageUrl);
             Picasso.get()
                     .load(imageUrl)

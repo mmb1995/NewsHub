@@ -21,7 +21,7 @@ public class NetworksModule {
 
     @Provides
     @Singleton
-    Retrofit provideRecipesRetrofit(OkHttpClient okHttpClient) {
+    Retrofit provideRetrofit(OkHttpClient okHttpClient) {
         return new Retrofit.Builder()
                 .baseUrl(Constants.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())

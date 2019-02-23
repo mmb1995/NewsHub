@@ -8,6 +8,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module(includes = {
+        DatabaseModule.class,
         NetworksModule.class,
         RepositoryModule.class,
         ViewModelModule.class

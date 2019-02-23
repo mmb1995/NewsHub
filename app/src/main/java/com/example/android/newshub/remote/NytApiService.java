@@ -16,7 +16,7 @@ public interface NytApiService {
                                                         @Query(Constants.SORT_PARAM) String sortOrder,
                                                         @Query(Constants.ARG_BEGIN_DATE) String beginDate,
                                                         @Query(Constants.ARG_END_DATE) String endDate);
-    @GET("topstories/v2/{search_query}")
+    @GET("topstories/v2/{search_query}.json")
     Call<TopStoriesResponse> getTopStories(@Path("search_query") String searchTerm,
                                            @Query(Constants.API_KEY_PARAM) String apiKey,
                                            @Query(Constants.SORT_PARAM) String sortOrder);

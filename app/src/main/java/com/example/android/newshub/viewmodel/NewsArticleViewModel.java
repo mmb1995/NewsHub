@@ -4,7 +4,8 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
-import com.example.android.newshub.model.NewsArticle;
+import com.example.android.newshub.model.Resource;
+import com.example.android.newshub.model.entity.NewsArticle;
 import com.example.android.newshub.repository.NewsRepository;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public class NewsArticleViewModel extends ViewModel {
     private static final String TAG = "NewsArticleViewModel";
 
     // Holds articles returned by the repo
-    private LiveData<List<NewsArticle>> mNewsArticles;
+    private LiveData<Resource<List<NewsArticle>>> mNewsArticles;
 
     private final NewsRepository mNewsRepo;
 
@@ -24,20 +25,13 @@ public class NewsArticleViewModel extends ViewModel {
         this.mNewsRepo = repository;
     }
 
-    public LiveData<List<NewsArticle>> getTopStories(String searchTerm) {
-        Log.i(TAG, "Getting top stories");
+    public LiveData<Resource<List<NewsArticle>>> getTopStories(String searchTerm) {
         if (mNewsArticles == null) {
+            Log.i(TAG, "Getting top stories");
             mNewsArticles = mNewsRepo.getTopStories(searchTerm);
         }
+        Log.i(TAG, "Returning top stories");
         return mNewsArticles;
     }
 
-    public LiveData<List<NewsArticle>> getArticleSearchResults(String searchTerm,
-                                                               String beginDate, String endDate) {
-        Log.i(TAG, "Getting article search");
-        if (mNewsArticles == null) {
-            mNewsArticles = mNewsRepo.getArticleSearchResults(searchTerm, beginDate, endDate);
-        }
-        return mNewsArticles;
-    }
 }
