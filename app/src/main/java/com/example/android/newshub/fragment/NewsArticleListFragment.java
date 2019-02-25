@@ -1,6 +1,7 @@
 package com.example.android.newshub.fragment;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.android.newshub.R;
+import com.example.android.newshub.activity.DetailsActivity;
 import com.example.android.newshub.adapter.NewsArticleAdapter;
 import com.example.android.newshub.interfaces.ArticleClickListener;
 import com.example.android.newshub.model.entity.NewsArticle;
@@ -54,6 +56,7 @@ public class NewsArticleListFragment extends Fragment implements ArticleClickLis
     private String mType;
     private String mQuery;
     private NewsArticleAdapter mAdapter;
+    private boolean isTwoPane;
 
 
     public NewsArticleListFragment() {
@@ -84,7 +87,6 @@ public class NewsArticleListFragment extends Fragment implements ArticleClickLis
         if (getArguments() != null) {
             mType = getArguments().getString(ARG_TYPE);
             mQuery = getArguments().getString(ARG_QUERY);
-            mSharedViewModel = ViewModelProviders.of(getActivity()).get(SelectedArticleViewModel.class);
         }
     }
 
@@ -142,6 +144,16 @@ public class NewsArticleListFragment extends Fragment implements ArticleClickLis
     @Override
     public void onArticleClicked(int position) {
         NewsArticle article = mAdapter.getItemAtPosition(position);
-        mSharedViewModel.selectArticle(article);
+        if (isTwoPane) {
+            // No need to launch a new activity because app is in two pane mode
+            // mSharedViewModel.selectArticle(article);
+        } else if (getActivity() != null) {
+            // launch details activity
+            Intent startDetailsIntent = new Intent(getActivity(), DetailsActivity.class);
+            startDetailsIntent.putExtra(Constants.DETAILS_ACTIVITY_INTENT_EXTRA, article.url);
+            getActivity().startActivity(startDetailsIntent);
+
+        }
     }
+
 }

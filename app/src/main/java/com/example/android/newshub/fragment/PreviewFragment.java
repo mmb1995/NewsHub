@@ -16,17 +16,23 @@ import android.widget.TextView;
 
 import com.example.android.newshub.R;
 import com.example.android.newshub.model.entity.NewsArticle;
-import com.example.android.newshub.viewmodel.SelectedArticleViewModel;
+import com.example.android.newshub.viewmodel.FactoryViewModel;
+import com.example.android.newshub.viewmodel.PreviewFragmentViewModel;
 import com.squareup.picasso.Picasso;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dagger.android.support.AndroidSupportInjection;
 
 /**
  *
  */
 public class PreviewFragment extends Fragment {
     private static final String TAG = "PreviewFragment";
+
+    private static final String ARG_ARTICLE_URL = "article_url";
 
     @BindView(R.id.articleTitleTextView)
     TextView mTitleTextView;
@@ -39,8 +45,12 @@ public class PreviewFragment extends Fragment {
     @BindView(R.id.fullArticleButton)
     Button mFullArticleBtn;
 
+    @Inject
+    public FactoryViewModel mFactoryViewModel;
+
     private OnFullArticleButtonListener mCallback;
     private NewsArticle mNewsArticle;
+    private String mArticleUrl;
 
     /**
      * Must be implemented by parent activity
@@ -52,6 +62,22 @@ public class PreviewFragment extends Fragment {
 
     public PreviewFragment() {
         // Required empty public constructor
+    }
+
+    public static PreviewFragment newInstance(String url) {
+        PreviewFragment fragment = new PreviewFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_ARTICLE_URL, url);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mArticleUrl = getArguments().getString(ARG_ARTICLE_URL);
+        }
     }
 
     @Override
@@ -82,17 +108,26 @@ public class PreviewFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        SelectedArticleViewModel model = ViewModelProviders.of(getActivity()).get(SelectedArticleViewModel.class);
-        model.getSelectedArticle().observe(this, article -> {
-            mNewsArticle = article;
-            updatePreview();
-        });
+        AndroidSupportInjection.inject(this);
+        getArticle();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mCallback = null;
+    }
+
+    private void getArticle() {
+        PreviewFragmentViewModel model = ViewModelProviders.of(this, mFactoryViewModel)
+                .get(PreviewFragmentViewModel.class);
+        model.init(mArticleUrl);
+        model.getArticle().observe(this, article -> {
+            if (article != null) {
+                mNewsArticle = article;
+                updatePreview();
+            }
+        });
     }
 
     private void updatePreview() {

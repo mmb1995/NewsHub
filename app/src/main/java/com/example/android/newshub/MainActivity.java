@@ -1,6 +1,5 @@
 package com.example.android.newshub;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -18,7 +17,6 @@ import com.example.android.newshub.fragment.PreviewFragment;
 import com.example.android.newshub.fragment.WebViewModalFragment;
 import com.example.android.newshub.model.entity.NewsArticle;
 import com.example.android.newshub.utils.Constants;
-import com.example.android.newshub.viewmodel.SelectedArticleViewModel;
 
 import javax.inject.Inject;
 
@@ -58,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         AndroidInjection.inject(this);
-        mSwipeRefresh.setOnRefreshListener(this);
 
         if (savedInstanceState == null) {
             isRestored = false;
@@ -68,12 +65,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         }
 
         setSupportActionBar(mToolbar);
-
-        // Set up observer to listen for when the user selects an article
-        SelectedArticleViewModel model = ViewModelProviders.of(this).get(SelectedArticleViewModel.class);
-        model.getSelectedArticle().observe(this, selectedArticle -> {
-            displayPreview();
-        });
+        mSwipeRefresh.setOnRefreshListener(this);
     }
 
     @Override
@@ -113,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
      */
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+        selectedPosition = position;
         if (isRestored) {
             isRestored = false;
         } else {
@@ -225,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putInt(BUNDLE_SPINNER_POSITION, mSpinner.getSelectedItemPosition());
+        outState.putInt(BUNDLE_SPINNER_POSITION, selectedPosition);
         super.onSaveInstanceState(outState);
     }
 }

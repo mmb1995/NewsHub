@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProvider;
 import com.example.android.newshub.di.ViewModelKey;
 import com.example.android.newshub.viewmodel.FactoryViewModel;
 import com.example.android.newshub.viewmodel.NewsArticleViewModel;
+import com.example.android.newshub.viewmodel.PreviewFragmentViewModel;
 
 import dagger.Binds;
 import dagger.Module;
@@ -17,6 +18,11 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(NewsArticleViewModel.class)
     abstract ViewModel bindNewsArticleViewModel(NewsArticleViewModel newsArticleViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(PreviewFragmentViewModel.class)
+    abstract ViewModel bindPreviewFragmentViewModel(PreviewFragmentViewModel previewViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(FactoryViewModel factory);

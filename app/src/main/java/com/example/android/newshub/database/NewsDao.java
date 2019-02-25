@@ -19,4 +19,10 @@ public interface NewsDao {
     @Query("SELECT * FROM Articles WHERE section=:section")
     LiveData<List<NewsArticle>> getArticlesBySection(String section);
 
+    @Query("SELECT * FROM Articles WHERE url=:url LIMIT 1")
+    LiveData<NewsArticle> getArticle(String url);
+
+    @Query("DELETE  FROM Articles WHERE section=:section")
+    int deleteOldArticles(String section);
+
 }

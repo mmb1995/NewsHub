@@ -59,6 +59,7 @@ public class NewsRepository {
             @Override
             protected void saveCallResult(@NonNull TopStoriesResponse response) {
                 Log.i(TAG, "response = " + response.getTopStories());
+                mNewsDao.deleteOldArticles(section);
                 List<NewsArticle> articles = processResponse(response.getTopStories());
                 mNewsDao.saveArticles(articles);
             }
@@ -134,6 +135,10 @@ public class NewsRepository {
                 return imageUrl;
             }
         }.getAsLiveData();
+    }
+
+    public LiveData<NewsArticle> getArticle(String url) {
+        return mNewsDao.getArticle(url);
     }
 
 }

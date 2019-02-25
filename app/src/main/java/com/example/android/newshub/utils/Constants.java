@@ -35,5 +35,7 @@ public class Constants {
 
     public static final String THUMBNAIL_IMAGE_KEY = "thumbLarge";
 
+    public static final String DETAILS_ACTIVITY_INTENT_EXTRA = "article_extra";
+
     public static final int MAX_IMAGE_WIDTH = 3000;
 }
