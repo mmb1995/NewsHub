@@ -18,4 +18,5 @@ public interface NewsDao {
 
     @Query("SELECT * FROM Articles WHERE section=:section")
     LiveData<List<NewsArticle>> getArticlesBySection(String section);
+
 }

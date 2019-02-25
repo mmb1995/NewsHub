@@ -5,6 +5,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.example.android.newshub.fragment.NewsArticleListFragment;
 import com.example.android.newshub.fragment.PreviewFragment;
@@ -23,19 +30,27 @@ import dagger.android.support.HasSupportFragmentInjector;
 
 public class MainActivity extends AppCompatActivity implements HasSupportFragmentInjector,
     PreviewFragment.OnFullArticleButtonListener, WebViewModalFragment.OnWebViewClickListener,
-        SwipeRefreshLayout.OnRefreshListener {
+        SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemSelectedListener {
 
     private static final String TAG = "MainActivity";
 
     private static final String WEB_VIEW_TAG = "WebViewFragment";
     private static final String NEWS_RESULTS_LIST_FRAGMENT_TAG = "NewsResultList";
     private static final String PREVIEW_FRAGMENT_TAG ="previewFragment";
+    private static final String BUNDLE_SPINNER_POSITION = "spinner_pos";
+    private static final String BUNDLE_SELECTED_SECTION = "selection";
 
     @BindView(R.id.mainSwipeRefresh)
     SwipeRefreshLayout mSwipeRefresh;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    private Spinner mSpinner;
+    private int selectedPosition = -1;
 
     @Inject
     DispatchingAndroidInjector<Fragment> dispatchingAndroidInjector;
+    private boolean isTwoPane;
+    private boolean isRestored;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,23 +58,91 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         AndroidInjection.inject(this);
-
         mSwipeRefresh.setOnRefreshListener(this);
+
+        if (savedInstanceState == null) {
+            isRestored = false;
+        } else {
+            selectedPosition = savedInstanceState.getInt(BUNDLE_SPINNER_POSITION);
+            isRestored = true;
+        }
+
+        setSupportActionBar(mToolbar);
 
         // Set up observer to listen for when the user selects an article
         SelectedArticleViewModel model = ViewModelProviders.of(this).get(SelectedArticleViewModel.class);
         model.getSelectedArticle().observe(this, selectedArticle -> {
             displayPreview();
         });
-
-        if (savedInstanceState == null) {
-            displayArticleListFragment();
-        }
     }
 
     @Override
     public DispatchingAndroidInjector<Fragment> supportFragmentInjector() {
         return dispatchingAndroidInjector;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.appbar_main, menu);
+
+        // Create the spinner
+        MenuItem item = menu.findItem(R.id.action_dropdown);
+        mSpinner = (Spinner) item.getActionView();
+
+        // Set listener
+        mSpinner.setOnItemSelectedListener(this);
+
+        // Create the adapter
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.sections_dropdown_array, android.R.layout.simple_spinner_dropdown_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinner.setAdapter(adapter);
+
+        // check for saved spinner state
+        if (selectedPosition != -1) {
+            mSpinner.setSelection(selectedPosition);
+        } else {
+            mSpinner.setSelection(0);
+        }
+
+        return true;
+    }
+
+    /**
+     * Displays a list on news articles based off the option the user chooses from the spinner
+     */
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+        if (isRestored) {
+            isRestored = false;
+        } else {
+            displaySelectedSection(position);
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+        // Required override method
+    }
+
+    /**
+     * Displays articles related to the current spinner selection also called by swipe refresh listener
+     * @param position
+     */
+    private void displaySelectedSection(int position) {
+        switch (position) {
+            case 0:
+                displayArticleListFragment(Constants.TOP_STORIES_HOME);
+                break;
+            case 1:
+                displayArticleListFragment(Constants.TOP_STORIES_WORLD);
+                break;
+            case 2:
+                displayArticleListFragment(Constants.TOP_STORIES_SPORTS);
+                break;
+            default:
+                break;
+        }
     }
 
     private void displayFragment(Fragment fragment) {
@@ -78,16 +161,20 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     }
 
     private void displayPreview() {
-        // Create preview fragment
-        PreviewFragment previewFragment = new PreviewFragment();
+        // Make sure observer doesn't force show preview fragment
+        if (isRestored) {
+            isRestored = false;
+        } else if (!(getCurrentFragment() instanceof PreviewFragment)) {
+            PreviewFragment previewFragment = new PreviewFragment();
 
-        // display preview and remove NewsResultListFragment
-        displayFragment(previewFragment);
+            // display preview and remove NewsResultListFragment
+            displayFragment(previewFragment);
+        }
     }
 
-    private void displayArticleListFragment() {
+    private void displayArticleListFragment(String section) {
         NewsArticleListFragment fragment = NewsArticleListFragment.newInstance(Constants.TOP_STORIES,
-                Constants.TOP_STORIES_HOME);
+                section);
         displayFragment(fragment);
     }
 
@@ -113,6 +200,10 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         return getSupportFragmentManager().findFragmentById(R.id.mainFragmentFrameLayout) != null;
     }
 
+    private Fragment getCurrentFragment() {
+        return getSupportFragmentManager().findFragmentById(R.id.mainFragmentFrameLayout);
+    }
+
     @Override
     public void onWebViewButtonClick() {
 
@@ -124,11 +215,17 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.mainFragmentFrameLayout);
         if (currentFragment != null) {
             if (currentFragment instanceof NewsArticleListFragment) {
-                displayArticleListFragment();
+                displaySelectedSection(mSpinner.getSelectedItemPosition());
             } else if (currentFragment instanceof PreviewFragment) {
                 displayPreview();
             }
         }
         mSwipeRefresh.setRefreshing(false);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt(BUNDLE_SPINNER_POSITION, mSpinner.getSelectedItemPosition());
+        super.onSaveInstanceState(outState);
     }
 }
