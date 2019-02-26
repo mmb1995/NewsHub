@@ -1,7 +1,7 @@
 package com.example.android.newshub.fragment;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,7 +15,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.android.newshub.R;
-import com.example.android.newshub.activity.DetailsActivity;
 import com.example.android.newshub.adapter.NewsArticleAdapter;
 import com.example.android.newshub.interfaces.ArticleClickListener;
 import com.example.android.newshub.model.entity.NewsArticle;
@@ -50,6 +49,8 @@ public class NewsArticleListFragment extends Fragment implements ArticleClickLis
 
     @Inject
     public FactoryViewModel mFactoryViewModel;
+
+    private OnArticleSelectedListner mCallback;
 
     // ViewModel shared by multiple fragments for keeping track of the currently selected TopStoriesArticle
     private SelectedArticleViewModel mSharedViewModel;
@@ -101,6 +102,19 @@ public class NewsArticleListFragment extends Fragment implements ArticleClickLis
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // Ensures the parent activity has implemented the necessary interfaces
+        try {
+            mCallback = (OnArticleSelectedListner) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + "must implement OnArticleSelectedListener");
+        }
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         AndroidSupportInjection.inject(this);
@@ -144,16 +158,14 @@ public class NewsArticleListFragment extends Fragment implements ArticleClickLis
     @Override
     public void onArticleClicked(int position) {
         NewsArticle article = mAdapter.getItemAtPosition(position);
-        if (isTwoPane) {
-            // No need to launch a new activity because app is in two pane mode
-            // mSharedViewModel.selectArticle(article);
-        } else if (getActivity() != null) {
-            // launch details activity
-            Intent startDetailsIntent = new Intent(getActivity(), DetailsActivity.class);
-            startDetailsIntent.putExtra(Constants.DETAILS_ACTIVITY_INTENT_EXTRA, article.url);
-            getActivity().startActivity(startDetailsIntent);
+        mCallback.onArticleSelected(article);
+    }
 
-        }
+    /**
+     * Interface that must be implemented by parent activity
+     */
+    public interface OnArticleSelectedListner {
+        void onArticleSelected(NewsArticle article);
     }
 
 }

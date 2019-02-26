@@ -1,6 +1,6 @@
 package com.example.android.newshub.di.module;
 
-import com.example.android.newshub.MainActivity;
+import com.example.android.newshub.activity.MainActivity;
 import com.example.android.newshub.activity.DetailsActivity;
 
 import dagger.Module;
